@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+
                 SetExchangeAdapter(exchangeList);
             }
         }
@@ -173,14 +175,12 @@ public class MainActivity extends AppCompatActivity {
     private void SetExchangeAdapter(ArrayList<Exchange> exchangeList) {
         if (exchangeList != null && exchangeList.size() > 0) {
             Collections.sort(exchangeList);
+            exchangeList.add(0, new Exchange("Exchange Average"));
             spExchanges.setEnabled(true);
         } else {
             spExchanges.setEnabled(false);
         }
 
-        if (exchangeList != null) {
-            exchangeList.add(0, new Exchange("Exchange Average"));
-        }
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
         spExchanges.setAdapter(spExchangeAdapter);
         selectedExchange = (Exchange) spExchanges.getSelectedItem();
@@ -266,10 +266,6 @@ public class MainActivity extends AppCompatActivity {
             Exchange coinDataExchange = coinData.getExchange();
 
             setCoinPair(coinDataPrimaryCoin.getShortName(), coinDataSecondaryCoin.getShortName());
-            selectedExchange = coinDataExchange;
-
-//                spExchanges.setSelection(availableExchangesPerPair.indexOf(coinDataExchange));
-
         }
     };
 
