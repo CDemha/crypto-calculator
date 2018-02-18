@@ -22,7 +22,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
 public class DownloadCoins extends AsyncTask<String, Integer, String> {
 
@@ -67,7 +71,6 @@ public class DownloadCoins extends AsyncTask<String, Integer, String> {
             while ((line = reader.readLine()) != null) {
                 result.append(line);
             }
-
             input.close();
             connection.disconnect();
             reader.close();
@@ -77,7 +80,6 @@ public class DownloadCoins extends AsyncTask<String, Integer, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return result.toString();
     }
 
@@ -88,9 +90,7 @@ public class DownloadCoins extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-
         try {
-
             super.onPostExecute(result);
             JSONObject listOfCoinsJson = new JSONObject(result.toString()).getJSONObject("Data");
             Iterator listOfCoinsIterator = listOfCoinsJson.keys();
@@ -103,14 +103,15 @@ public class DownloadCoins extends AsyncTask<String, Integer, String> {
             }
 
             Locale[] locs = Locale.getAvailableLocales();
-            for(Locale loc : locs) {
+            for (Locale loc : locs) {
                 try {
-                    Currency currency = Currency.getInstance( loc );
-                    if ( currency != null ) {
+                    Currency currency = Currency.getInstance(loc);
+                    if (currency != null) {
                         Coin newCoin = new Coin(0, currency.getCurrencyCode().trim(), currency.getDisplayName().trim(), false, true);
                         coinController.addCoin(newCoin);
                     }
-                } catch(Exception exc) { }
+                } catch (Exception exc) {
+                }
             }
             Serializer.Serialize(coinControllerFile, coinController);
 

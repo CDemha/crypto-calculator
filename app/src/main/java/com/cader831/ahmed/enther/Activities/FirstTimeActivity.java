@@ -2,9 +2,12 @@ package com.cader831.ahmed.enther.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
 import com.cader831.ahmed.enther.AsyncTasks.DownloadCoins;
 import com.cader831.ahmed.enther.R;
 import com.cader831.ahmed.enther.Utility;
@@ -23,7 +26,8 @@ public class FirstTimeActivity extends AppCompatActivity {
         if (!(coinFileCreated && exchangeFileCreated)) {
             setContentView(R.layout.activity_first_time);
             getSupportActionBar().hide();
-            new DownloadCoins(this, preferences).execute("https://min-api.cryptocompare.com/data/all/coinlist");
+            DownloadCoins downloadCoins = new DownloadCoins(this, preferences);
+            downloadCoins.execute("https://min-api.cryptocompare.com/data/all/coinlist");
         } else {
             Intent mainActivity = new Intent(this, MainActivity.class);
             this.startActivity(mainActivity);

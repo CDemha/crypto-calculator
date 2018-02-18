@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -58,16 +57,21 @@ public class MainActivity extends AppCompatActivity {
     private CoinData coinData;
 
     private void downloadCoinPair() {
-        String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
-        String downloadPrice;
-        if (selectedExchange.equals(new Exchange("Exchange Average"))) {
-            downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
+
+        if (Utility.networkAvailable(this)) {
+            String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+            String downloadPrice;
+            if (selectedExchange.equals(new Exchange("Exchange Average"))) {
+                downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
+            } else {
+                downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
+            }
+            Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            DownloadApiData downloadApiData = new DownloadApiData();
+            downloadApiData.execute(downloadPrice);
         } else {
-            downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
+            Toast.makeText(this, "A network connection is required.", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
-        DownloadApiData downloadApiData = new DownloadApiData();
-        downloadApiData.execute(downloadPrice);
     }
 
     @Override
@@ -153,11 +157,12 @@ public class MainActivity extends AppCompatActivity {
         TriggerCoinSelection();
     }
 
+    ArrayList<Exchange> exchangeList;
     private void TriggerCoinSelection() {
         if (coinChangeResult == 2) {
             if (selectedPrimaryCoin != null && selectedSecondaryCoin != null) {
                 coinChangeResult = 1;
-                ArrayList<Exchange> exchangeList = new ArrayList<>();
+                exchangeList = new ArrayList<>();
                 for (Exchange exchange : exchangeController.getExchangesToList()) {
                     List<Coin> supportedCoinsA = exchange.getSupportedCoins(selectedPrimaryCoin.getLongName());
                     if ((supportedCoinsA != null && supportedCoinsA.size() > 0)) {
@@ -166,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-
                 SetExchangeAdapter(exchangeList);
             }
         }
@@ -175,10 +179,13 @@ public class MainActivity extends AppCompatActivity {
     private void SetExchangeAdapter(ArrayList<Exchange> exchangeList) {
         if (exchangeList != null && exchangeList.size() > 0) {
             Collections.sort(exchangeList);
-            exchangeList.add(0, new Exchange("Exchange Average"));
             spExchanges.setEnabled(true);
         } else {
             spExchanges.setEnabled(false);
+        }
+
+        if (exchangeList != null) {
+            exchangeList.add(0, new Exchange("Exchange Average"));
         }
 
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
@@ -266,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
             Exchange coinDataExchange = coinData.getExchange();
 
             setCoinPair(coinDataPrimaryCoin.getShortName(), coinDataSecondaryCoin.getShortName());
+            spExchanges.setSelection(exchangeList.indexOf(coinDataExchange));
         }
     };
 
