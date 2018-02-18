@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -58,16 +57,21 @@ public class MainActivity extends AppCompatActivity {
     private CoinData coinData;
 
     private void downloadCoinPair() {
-        String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
-        String downloadPrice;
-        if (selectedExchange.equals(new Exchange("Exchange Average"))) {
-            downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
+
+        if (Utility.networkAvailable(this)) {
+            String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+            String downloadPrice;
+            if (selectedExchange.equals(new Exchange("Exchange Average"))) {
+                downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
+            } else {
+                downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
+            }
+            Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            DownloadApiData downloadApiData = new DownloadApiData();
+            downloadApiData.execute(downloadPrice);
         } else {
-            downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
+            Toast.makeText(this, "A network connection is required.", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
-        DownloadApiData downloadApiData = new DownloadApiData();
-        downloadApiData.execute(downloadPrice);
     }
 
     @Override
