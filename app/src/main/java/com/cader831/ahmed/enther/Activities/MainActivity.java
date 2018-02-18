@@ -153,11 +153,12 @@ public class MainActivity extends AppCompatActivity {
         TriggerCoinSelection();
     }
 
+    ArrayList<Exchange> exchangeList;
     private void TriggerCoinSelection() {
         if (coinChangeResult == 2) {
             if (selectedPrimaryCoin != null && selectedSecondaryCoin != null) {
                 coinChangeResult = 1;
-                ArrayList<Exchange> exchangeList = new ArrayList<>();
+                exchangeList = new ArrayList<>();
                 for (Exchange exchange : exchangeController.getExchangesToList()) {
                     List<Coin> supportedCoinsA = exchange.getSupportedCoins(selectedPrimaryCoin.getLongName());
                     if ((supportedCoinsA != null && supportedCoinsA.size() > 0)) {
@@ -166,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-
                 SetExchangeAdapter(exchangeList);
             }
         }
@@ -175,10 +175,13 @@ public class MainActivity extends AppCompatActivity {
     private void SetExchangeAdapter(ArrayList<Exchange> exchangeList) {
         if (exchangeList != null && exchangeList.size() > 0) {
             Collections.sort(exchangeList);
-            exchangeList.add(0, new Exchange("Exchange Average"));
             spExchanges.setEnabled(true);
         } else {
             spExchanges.setEnabled(false);
+        }
+
+        if (exchangeList != null) {
+            exchangeList.add(0, new Exchange("Exchange Average"));
         }
 
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
@@ -266,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
             Exchange coinDataExchange = coinData.getExchange();
 
             setCoinPair(coinDataPrimaryCoin.getShortName(), coinDataSecondaryCoin.getShortName());
+            spExchanges.setSelection(exchangeList.indexOf(coinDataExchange));
         }
     };
 
