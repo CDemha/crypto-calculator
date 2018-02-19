@@ -56,7 +56,7 @@ public class CoinData implements Serializable {
 
     @Override
     public String toString() {
-        SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-        return String.format("(%s-%s-%s): [DPrice: %.8f, CPrice: %.8f] at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, calculatedPrice, lastUpdateDate.format(lastUpdate));
+        SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+        return String.format("(%s-%s-%s): [DPrice: %.8f, CPrice: %.8f] at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, calculatedPrice, lastUpdateDate.format(lastUpdate).toString());
     }
 }
