@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
         coinData = coinController.getCoinData(coinExchangePair);
-        Log.i(TAG, "onAsyncTaskResult: " + coinData);
         performCalculation(editPrimaryAmount.getText().toString());
         Toast.makeText(getApplicationContext(), String.format("%s downloaded successfully.", coinPair), Toast.LENGTH_SHORT).show();
         updateConversionListview(coinController);
@@ -103,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             Double d = Double.parseDouble(coinJSONData.get(selectedSecondaryCoin.getShortName()).toString());
             BigDecimal price = new BigDecimal(d, MathContext.DECIMAL64);
             Exchange selectedExchange = (Exchange) spExchanges.getSelectedItem();
-            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, null, null, new Date());
+            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, new Date());
             coinController.setCoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, coinData, localCoinsFile);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -118,9 +117,6 @@ public class MainActivity extends AppCompatActivity {
         decimalFormat.setGroupingSize(3);
         String result = decimalFormat.format(resultOfPriceMulti);
         tvConversionResult.setText(result);
-        if (amount != 0) {
-            Log.i(TAG, "displayResult: " + coinData);
-        }
     }
 
     private void performCalculation(String amountInString) {

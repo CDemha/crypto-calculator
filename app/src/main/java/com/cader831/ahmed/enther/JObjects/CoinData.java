@@ -8,40 +8,16 @@ import java.util.Date;
 public class CoinData implements Serializable {
     private Coin primaryCoin;
     private Coin secondaryCoin;
-    private BigDecimal downloadPrice;
-    private BigDecimal calculatedPrice;
-    private Date lastUpdate;
-    private BigDecimal priceHigh;
-    private BigDecimal priceLow;
     private Exchange exchange;
-    private boolean isCalculated;
+    private BigDecimal downloadPrice;
+    private Date lastUpdate;
 
-
-    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice, BigDecimal priceHigh, BigDecimal priceLow, Date lastUpdate) {
+    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice, Date lastUpdate) {
         this.primaryCoin = primaryCoin;
         this.secondaryCoin = secondaryCoin;
         this.exchange = exchange;
         this.downloadPrice = downloadPrice;
         this.lastUpdate = lastUpdate;
-        this.priceHigh = priceHigh;
-        this.priceLow = priceLow;
-        isCalculated = false;
-    }
-
-    public boolean isCalculated() {
-        return isCalculated;
-    }
-
-    public void setCalculated(boolean isCalculated) {
-        this.isCalculated = isCalculated;
-    }
-
-    public BigDecimal getCalculatedPrice() {
-        return calculatedPrice;
-    }
-
-    public void setCalculatedPrice(BigDecimal calculatedPrice) {
-        this.calculatedPrice = calculatedPrice;
     }
 
     public Coin getPrimaryCoin() {
@@ -67,6 +43,6 @@ public class CoinData implements Serializable {
     @Override
     public String toString() {
         SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
-        return String.format("(%s-%s-%s): [DPrice: %.8f, CPrice: %.8f] at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, calculatedPrice, lastUpdateDate.format(lastUpdate).toString());
+        return String.format("(%s-%s-%s): Downloaded Price: %.8f at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, lastUpdateDate.format(lastUpdate).toString());
     }
 }
