@@ -118,6 +118,9 @@ public class MainActivity extends AppCompatActivity {
         decimalFormat.setGroupingSize(3);
         String result = decimalFormat.format(resultOfPriceMulti);
         tvConversionResult.setText(result);
+        if (amount != 0) {
+            Log.i(TAG, "displayResult: " + coinData);
+        }
     }
 
     private void performCalculation(String amountInString) {

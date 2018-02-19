@@ -58,28 +58,31 @@ public class CoinsDataAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View rowView = convertView;
         CoinData coinData = (CoinData) getItem(position);
-        if (convertView == null) {
-            LayoutInflater inflater = context.getLayoutInflater();
-            convertView = inflater.inflate(R.layout.layout_coins_data_adaptor, null);
+        LayoutInflater inflater = context.getLayoutInflater();
+
+        if (rowView == null) {
+            rowView = inflater.inflate(R.layout.layout_coins_data_adaptor, null);
             viewHolder = new ViewHolder();
-            viewHolder.tvPrimaryC = (TextView) convertView.findViewById(R.id.tvPrimaryC);
-            viewHolder.tvSecondaryC = (TextView) convertView.findViewById(R.id.tvSecondaryC);
-            viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
-            viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
-            convertView.setTag(viewHolder);
+            viewHolder.tvPrimaryC = (TextView) rowView.findViewById(R.id.tvPrimaryC);
+            viewHolder.tvSecondaryC = (TextView) rowView.findViewById(R.id.tvSecondaryC);
+            viewHolder.tvExchange = (TextView) rowView.findViewById(R.id.tvExchange);
+            viewHolder.tvUpdateDate = (TextView) rowView.findViewById(R.id.tvUpdateDate);
+            rowView.setTag(viewHolder);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) rowView.getTag();
         }
 
         if (coinData != null && coinData.isCalculated()) {
             viewHolder.tvPrimaryC.setText(coinData.getPrimaryCoin().getShortName());
             viewHolder.tvSecondaryC.setText(coinData.getSecondaryCoin().getShortName());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
-            long now = System.currentTimeMillis();
-            CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(coinData.getLastUpdate().getTime(), now, DateUtils.FORMAT_ABBREV_TIME);
+            CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(coinData.getLastUpdate().getTime(), System.currentTimeMillis(), DateUtils.FORMAT_ABBREV_TIME);
             viewHolder.tvUpdateDate.setText(relativeTimeSpanString);
+        } else {
+
         }
-        return convertView;
+        return rowView;
     }
 }
