@@ -2,27 +2,36 @@ package com.cader831.ahmed.enther.JObjects;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CoinData implements Serializable {
     private Coin primaryCoin;
     private Coin secondaryCoin;
-    private BigDecimal price;
+    private BigDecimal downloadPrice;
+    private BigDecimal calculatedPrice;
     private Date lastUpdate;
     private BigDecimal priceHigh;
     private BigDecimal priceLow;
     private Exchange exchange;
 
 
-    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal price, BigDecimal priceHigh, BigDecimal priceLow, Date lastUpdate) {
+    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice ,BigDecimal priceHigh, BigDecimal priceLow, Date lastUpdate) {
         this.primaryCoin = primaryCoin;
         this.secondaryCoin = secondaryCoin;
         this.exchange = exchange;
-        this.price = price;
+        this.downloadPrice = downloadPrice;
         this.lastUpdate = lastUpdate;
         this.priceHigh = priceHigh;
         this.priceLow = priceLow;
+    }
 
+    public BigDecimal getCalculatedPrice() {
+        return calculatedPrice;
+    }
+
+    public void setCalculatedPrice(BigDecimal calculatedPrice) {
+        this.calculatedPrice = calculatedPrice;
     }
 
     public Coin getPrimaryCoin() {
@@ -41,12 +50,13 @@ public class CoinData implements Serializable {
         return lastUpdate;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getDownloadPrice() {
+        return downloadPrice;
     }
 
     @Override
     public String toString() {
-        return String.format("(%s-%s-%s): [Price: %.8f, High: %.8f, Low: %.8f] at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, price, priceHigh, priceLow, lastUpdate);
+        SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+        return String.format("(%s-%s-%s): [DPrice: %.8f, CPrice: %.8f] at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, calculatedPrice, lastUpdateDate);
     }
 }

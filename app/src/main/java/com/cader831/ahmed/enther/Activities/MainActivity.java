@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
         coinData = coinController.getCoinData(coinExchangePair);
+        Log.i(TAG, "onAsyncTaskResult: " + coinData);
         performCalculation(editPrimaryAmount.getText().toString());
         Toast.makeText(getApplicationContext(), String.format("%s downloaded successfully.", coinPair), Toast.LENGTH_SHORT).show();
         updateConversionListview(coinController);
@@ -109,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayResult(double amount) {
-        BigDecimal resultOfPriceMulti = coinData.getPrice().multiply(new BigDecimal(amount, MathContext.DECIMAL64));
+        BigDecimal resultOfPriceMulti = coinData.getDownloadPrice().multiply(new BigDecimal(amount, MathContext.DECIMAL64));
         resultOfPriceMulti.setScale(8, RoundingMode.HALF_UP);
         DecimalFormat decimalFormat = new DecimalFormat("0.00000000");
         decimalFormat.setGroupingUsed(true);
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     ArrayList<Exchange> exchangeList;
+
     private void TriggerCoinSelection() {
         if (coinChangeResult == 2) {
             if (selectedPrimaryCoin != null && selectedSecondaryCoin != null) {
