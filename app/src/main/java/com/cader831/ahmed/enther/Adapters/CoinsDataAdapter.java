@@ -72,7 +72,7 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (coinData != null) {
+        if (coinData != null && coinData.isCalculated()) {
             viewHolder.tvPrimaryC.setText(coinData.getPrimaryCoin().getShortName());
             viewHolder.tvSecondaryC.setText(coinData.getSecondaryCoin().getShortName());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());

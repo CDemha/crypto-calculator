@@ -14,9 +14,10 @@ public class CoinData implements Serializable {
     private BigDecimal priceHigh;
     private BigDecimal priceLow;
     private Exchange exchange;
+    private boolean isCalculated;
 
 
-    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice ,BigDecimal priceHigh, BigDecimal priceLow, Date lastUpdate) {
+    public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice, BigDecimal priceHigh, BigDecimal priceLow, Date lastUpdate) {
         this.primaryCoin = primaryCoin;
         this.secondaryCoin = secondaryCoin;
         this.exchange = exchange;
@@ -24,6 +25,15 @@ public class CoinData implements Serializable {
         this.lastUpdate = lastUpdate;
         this.priceHigh = priceHigh;
         this.priceLow = priceLow;
+        isCalculated = false;
+    }
+
+    public boolean isCalculated() {
+        return isCalculated;
+    }
+
+    public void setCalculated(boolean isCalculated) {
+        this.isCalculated = isCalculated;
     }
 
     public BigDecimal getCalculatedPrice() {

@@ -269,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             CoinData coinData = ((CoinData) lstvCoinData.getAdapter().getItem(i));
-            ExchangeAdapter spinnerExchangeAdapter = ((ExchangeAdapter) spExchanges.getAdapter());
 
             Coin coinDataPrimaryCoin = coinData.getPrimaryCoin();
             Coin coinDataSecondaryCoin = coinData.getSecondaryCoin();
