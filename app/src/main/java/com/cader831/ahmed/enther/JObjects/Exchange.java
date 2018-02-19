@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-public class Exchange implements Comparable,Serializable {
+public class Exchange implements Comparable, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public String Name;
     public boolean isFavourited;

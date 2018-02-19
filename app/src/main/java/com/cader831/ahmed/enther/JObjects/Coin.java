@@ -2,20 +2,14 @@ package com.cader831.ahmed.enther.JObjects;
 
 import java.io.Serializable;
 
-/**
- * Created by Ahmed on 8/01/2018.
- */
-
 public class Coin implements Comparable, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private int Id;
-
     private String Symbol;
-
     private String CoinName;
-
     private boolean isFavourite;
-
     private boolean isLocalCurrency;
 
     public Coin(int id, String symbol, String coinName, boolean isFavourite, boolean isLocalCurrency) {

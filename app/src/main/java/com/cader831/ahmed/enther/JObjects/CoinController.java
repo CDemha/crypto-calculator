@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class CoinController implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private Map<String, Coin> mapOfCoins = new HashMap<>();
     private Map<String, String> coinNames = new HashMap<>();
     private HashMap<String, CoinData> coinDataMap = new HashMap<>();

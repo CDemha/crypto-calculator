@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class ExchangeController implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     Map<String, Exchange> ExchangeMap = new HashMap<>();
 
     public ExchangeController() {

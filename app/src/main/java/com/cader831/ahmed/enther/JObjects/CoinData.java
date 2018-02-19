@@ -4,8 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class CoinData implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Coin primaryCoin;
     private Coin secondaryCoin;
     private Exchange exchange;
@@ -42,7 +46,7 @@ public class CoinData implements Serializable {
 
     @Override
     public String toString() {
-        SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+        SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", Locale.getDefault());
         return String.format("(%s-%s-%s): Downloaded Price: %.8f at %s", primaryCoin.getShortName(), secondaryCoin.getShortName(), exchange, downloadPrice, lastUpdateDate.format(lastUpdate).toString());
     }
 }
