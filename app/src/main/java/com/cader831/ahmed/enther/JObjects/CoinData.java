@@ -15,7 +15,6 @@ public class CoinData implements Serializable {
     private Coin secondaryCoin;
     private Exchange exchange;
     private BigDecimal downloadPrice;
-    private BigDecimal definedAmount;
     private Date lastUpdate;
 
     public CoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, BigDecimal downloadPrice, Date lastUpdate) {
@@ -24,7 +23,6 @@ public class CoinData implements Serializable {
         this.exchange = exchange;
         this.downloadPrice = downloadPrice;
         this.lastUpdate = lastUpdate;
-        this.definedAmount = new BigDecimal(0, MathContext.DECIMAL64);
     }
 
     public Coin getPrimaryCoin() {
@@ -47,20 +45,12 @@ public class CoinData implements Serializable {
         return downloadPrice;
     }
 
-    public void setDefinedAmount(BigDecimal definedAmount) {
-        this.definedAmount = definedAmount;
-    }
-
-    public BigDecimal getDefinedAmount() {
-        return definedAmount;
-    }
-
     @Override
     public String toString() {
         SimpleDateFormat lastUpdateDate = new SimpleDateFormat("EEE, d MMM yyyy h:mm:ss", Locale.US);
         if (getExchange().getName().equals("Global Average")) {
-            return String.format("%s-%s: Price: %.8f, Defined Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getDownloadPrice(), getDefinedAmount() ,lastUpdateDate.format(lastUpdate));
+            return String.format("%s-%s: Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getDownloadPrice(),lastUpdateDate.format(lastUpdate));
         }
-        return String.format("%s-%s-%s: Price: %.8f, Defined Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getExchange(), getDownloadPrice(), getDefinedAmount() ,lastUpdateDate.format(lastUpdate));
+        return String.format("%s-%s-%s: Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getExchange(), getDownloadPrice() ,lastUpdateDate.format(lastUpdate));
     }
 }
