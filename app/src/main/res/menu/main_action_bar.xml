@@ -3,14 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-            android:id="@+id/mSyncItems"
-            android:checkable="false"
-            android:enabled="true"
-            android:icon="@drawable/ic_action_sync"
-            android:title="Synchronize Coins List"
-            android:visible="true"
-            app:showAsAction="always"/>
-    <item
-            android:title="Settings"
-            app:showAsAction="always|collapseActionView" android:icon="@drawable/ic_action_settings"/>
+        android:id="@+id/mSettings"
+        android:icon="@drawable/ic_action_settings"
+        android:title="Settings"
+        app:showAsAction="collapseActionView" />
 </menu>
