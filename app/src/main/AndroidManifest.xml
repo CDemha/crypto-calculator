@@ -15,10 +15,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.Design">
         <activity
-                android:name=".Activities.MainActivity" android:label="Cryptulator" android:theme="@style/Theme.AppCompat.NoActionBar"/>
-        <activity
-                android:name=".Activities.SelectCoinActivity"
-                android:label="Select Coin"/>
+                android:name=".Activities.MainActivity" android:label="Cryptulator" />
         <activity android:name=".Activities.FirstTimeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
