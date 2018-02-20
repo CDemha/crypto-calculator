@@ -372,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.mSyncItems:
+            case R.id.mSettings:
 
                 return true;
             default:
