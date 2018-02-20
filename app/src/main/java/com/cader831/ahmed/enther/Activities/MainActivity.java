@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         if (Utility.networkAvailable(this)) {
             String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
             String downloadPrice;
-            if (selectedExchange.equals(new Exchange("Exchange Average"))) {
+            if (selectedExchange.equals(new Exchange("Global Average"))) {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
             } else {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (exchangeList != null) {
-            exchangeList.add(0, new Exchange("Exchange Average"));
+            exchangeList.add(0, new Exchange("Global Average"));
         }
 
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
@@ -249,9 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextWatcher editPrimaryAmountTextWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -259,9 +257,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-
-        }
+        public void afterTextChanged(Editable s) { }
     };
 
     private AdapterView.OnItemClickListener lstvCoinDataHistoryClick = new AdapterView.OnItemClickListener() {
