@@ -1,9 +1,12 @@
 package com.cader831.ahmed.enther.JObjects;
 
+import android.util.Log;
+
 import com.cader831.ahmed.enther.Serializer;
 
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

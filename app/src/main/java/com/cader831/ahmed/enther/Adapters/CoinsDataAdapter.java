@@ -13,8 +13,10 @@ import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 public class CoinsDataAdapter extends BaseAdapter {
     static class ViewHolder {
@@ -22,6 +24,7 @@ public class CoinsDataAdapter extends BaseAdapter {
         TextView tvSecondaryC;
         TextView tvExchange;
         TextView tvUpdateDate;
+        TextView tvSecondaryCTo;
     }
 
     private ArrayList<CoinData> coinDataList;
@@ -70,6 +73,7 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvSecondaryC = (TextView) convertView.findViewById(R.id.tvSecondaryC);
             viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
             viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
+            viewHolder.tvSecondaryCTo = (TextView) convertView.findViewById(R.id.tvSecondaryCTo);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -79,9 +83,9 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvPrimaryC.setText(coinData.getPrimaryCoin().getShortName());
             viewHolder.tvSecondaryC.setText(coinData.getSecondaryCoin().getShortName());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
-            CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(coinData.getLastUpdate().getTime(), System.currentTimeMillis(), DateUtils.FORMAT_ABBREV_TIME);
-            viewHolder.tvUpdateDate.setText(relativeTimeSpanString);
-            Log.i("MyApp", String.valueOf(coinData));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
+            viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
+            viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getDownloadPrice()));
         }
 
         return convertView;
