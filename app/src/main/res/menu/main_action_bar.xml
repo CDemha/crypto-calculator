@@ -6,5 +6,6 @@
         android:id="@+id/mSettings"
         android:icon="@drawable/ic_action_settings"
         android:title="Settings"
+        android:visible="false"
         app:showAsAction="collapseActionView" />
 </menu>

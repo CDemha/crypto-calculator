@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -86,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
         setCoinData(event.getResult());
         String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
-        coinData = coinController.getCoinData(coinExchangePair);
-        performCalculation(editPrimaryAmount.getText().toString());
+        coinData = coinController.getCoinData(coinExchangePair).get(0);
+//        Log.i(TAG, coinController.getCoinData(coinPair)..toString());
+
+//        performCalculation(editPrimaryAmount.getText().toString());
         Toast.makeText(getApplicationContext(), String.format("%s downloaded successfully.", coinPair), Toast.LENGTH_SHORT).show();
         updateConversionListview(coinController);
     }
@@ -121,8 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void performCalculation(String amountInString) {
         String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-        coinData = coinController.getCoinData(coinExchangePair);
-
+        coinData = coinController.getCoinData(coinExchangePair).get(0);
+//
         if (coinData == null) {
             downloadCoinPair();
         } else {
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnCopyToClipboard = (ImageButton) findViewById(R.id.btnCopyToClipboard);
         ImageButton btnSwapCoins = (ImageButton) findViewById(R.id.btnSwapCoins);
 
+
         editPrimaryAmount = (EditText) findViewById(R.id.editPrimaryAmount);
         editPrimaryAmount.addTextChangedListener(editPrimaryAmountTextWatcher);
 
@@ -221,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         tvPrimaryCoinSelector.setOnLongClickListener(tvPrimaryCoinSelectorLongClick);
         tvSecondaryCoinSelector.setOnClickListener(tvSecondaryCoinSelectorClick);
         btnSwapCoins.setOnClickListener(btnSwapCoinsClick);
+
 
         lstvCoinData.setOnItemClickListener(lstvCoinDataHistoryClick);
 
@@ -235,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
             exchangeController = (ExchangeController) Serializer.Deserialize(localExchangesFile);
         }
         setCoinPair("BTC", "ETH");
+        Log.i(TAG, coinController.getCoinDataMap().get("ETH-BTC-Global Average").toString());
         EventBus.getInstance().register(this);
 
         CoinsDataAdapter coinsDataAdapter = new CoinsDataAdapter(this, coinController);
@@ -280,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable("CoinController", coinController);
         selectCoinsActivity.putExtras(bundle);
-        startActivityForResult(selectCoinsActivity, Utility.ACTIVITYRESULT_PRIMARY_COIN_REQUEST);
+        startActivityForResult(selectCoinsActivity, Utility.RESULT_PRIMARY_COIN_REQUEST);
     };
 
     private View.OnLongClickListener tvPrimaryCoinSelectorLongClick = v -> {
@@ -293,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable("CoinController", coinController);
         selectCoinsActivity.putExtras(bundle);
-        startActivityForResult(selectCoinsActivity, Utility.ACTIVITYRESULT_SECONDARY_COIN_REQUEST);
+        startActivityForResult(selectCoinsActivity, Utility.RESULT_SECONDARY_COIN_REQUEST);
     };
 
     private View.OnClickListener btnCopyToClipboardClick = v -> {
@@ -302,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
         clipboard.setPrimaryClip(clip);
         Toast.makeText(getApplicationContext(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
     };
+
 
     private View.OnLongClickListener btnCopyToClipboardHold = v -> {
         String calculatedAmount = tvConversionResult.getText().toString();
@@ -326,12 +333,12 @@ public class MainActivity extends AppCompatActivity {
             Coin selectedCoin = (Coin) data.getSerializableExtra("SelectedCoin");
 
             if (resultCode == RESULT_OK) {
-                if (requestCode == Utility.ACTIVITYRESULT_PRIMARY_COIN_REQUEST) {
+                if (requestCode == Utility.RESULT_PRIMARY_COIN_REQUEST) {
                     if (selectedCoin != null) {
                         setPrimaryCoin(coinController.getCoin(selectedCoin.getLongName()).getShortName());
                     }
                 }
-                if (requestCode == Utility.ACTIVITYRESULT_SECONDARY_COIN_REQUEST) {
+                if (requestCode == Utility.RESULT_SECONDARY_COIN_REQUEST) {
                     if (selectedCoin != null) {
                         setSecondaryCoin(coinController.getCoin(selectedCoin.getLongName()).getShortName());
                     }
@@ -347,12 +354,13 @@ public class MainActivity extends AppCompatActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedExchange = (Exchange) parent.getItemAtPosition(position);
             String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-            coinData = coinController.getCoinData(coinExchangePair);
-            if (coinData == null) {
-                downloadCoinPair();
-            } else {
-                performCalculation(editPrimaryAmount.getText().toString());
-            }
+//            Log.i(TAG, coinController.getCoinData(coinExchangePair).get(0).toString());
+//            coinData = coinController.getCoinData(coinExchangePair).get(0);
+//            if (coinData == null) {
+//                downloadCoinPair();
+//            } else {
+//                performCalculation(editPrimaryAmount.getText().toString());
+//            }
         }
 
         @Override

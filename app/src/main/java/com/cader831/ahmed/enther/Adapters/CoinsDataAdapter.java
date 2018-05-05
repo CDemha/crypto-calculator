@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
@@ -15,6 +17,7 @@ import com.cader831.ahmed.enther.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -27,7 +30,7 @@ public class CoinsDataAdapter extends BaseAdapter {
         TextView tvSecondaryCTo;
     }
 
-    private ArrayList<CoinData> coinDataList;
+    private ArrayList<ArrayList<CoinData>> coinDataList;
     private Activity context;
     private CoinController coinController;
 
@@ -43,13 +46,16 @@ public class CoinsDataAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return coinDataList.get(position);
+        return coinDataList.get(position).get(0);
     }
 
     public void updateListView(CoinController coinController) {
         this.coinController = coinController;
+        for (ArrayList<CoinData> c :coinController.getCoinDataMap().values()) {
+            Collections.sort(c);
+        }
         coinDataList = new ArrayList<>(coinController.getCoinDataMap().values());
-        Collections.sort(coinDataList, (o2, o1) -> o1.getLastUpdate().compareTo(o2.getLastUpdate()));
+        Collections.sort(coinDataList, (o2, o1) -> o1.get(0).getLastUpdate().compareTo(o2.get(0).getLastUpdate()));
         CoinsDataAdapter.this.notifyDataSetChanged();
     }
 
@@ -74,6 +80,11 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
             viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
             viewHolder.tvSecondaryCTo = (TextView) convertView.findViewById(R.id.tvSecondaryCTo);
+            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
+            btnShowHistory.setOnClickListener(v -> {
+                Toast.makeText(context, coinData.getPrimaryCoin().getShortName() + " " + coinData.getSecondaryCoin().getShortName() + " " + coinData.getExchange().getName(), Toast.LENGTH_SHORT).show();
+
+            });
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -86,8 +97,12 @@ public class CoinsDataAdapter extends BaseAdapter {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
             viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
             viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getDownloadPrice()));
-        }
+            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
+            btnShowHistory.setOnClickListener(v -> {
+                Toast.makeText(context, coinData.getPrimaryCoin().getShortName() + " " + coinData.getSecondaryCoin().getShortName() + " " + coinData.getExchange().getName(), Toast.LENGTH_SHORT).show();
 
+            });
+        }
         return convertView;
     }
 }

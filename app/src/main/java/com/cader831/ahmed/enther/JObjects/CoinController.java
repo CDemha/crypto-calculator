@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class CoinController implements Serializable {
 
     private Map<String, Coin> mapOfCoins = new HashMap<>();
     private Map<String, String> coinNames = new HashMap<>();
-    private HashMap<String, CoinData> coinDataMap = new HashMap<>();
+    private HashMap<String, ArrayList<CoinData>> coinDataMap = new HashMap<>();
 
     public CoinController() {
 
@@ -84,15 +85,22 @@ public class CoinController implements Serializable {
 
     public void setCoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, CoinData coinData, File file) {
         String coinPair = generateCoinExchangePair(primaryCoin, secondaryCoin, exchange);
-        coinDataMap.put(coinPair, coinData);
+        if (coinDataMap.containsKey(coinPair)) {
+            coinDataMap.get(coinPair).add(coinData);
+        } else {
+            ArrayList<CoinData> listOfCoinData = new ArrayList();
+            listOfCoinData.add(coinData);
+            coinDataMap.put(coinPair, listOfCoinData);
+        }
         Serializer.Serialize(file, this);
     }
 
-    public Map<String, CoinData> getCoinDataMap() {
+    public Map<String, ArrayList<CoinData>> getCoinDataMap() {
         return coinDataMap;
     }
 
-    public CoinData getCoinData(String coinPair) {
+    public ArrayList<CoinData> getCoinData(String coinPair) {
+        Collections.sort(coinDataMap.get(coinPair));
         return coinDataMap.get(coinPair);
     }
 }
