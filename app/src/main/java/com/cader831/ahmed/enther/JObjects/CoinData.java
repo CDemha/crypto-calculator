@@ -1,10 +1,7 @@
 package com.cader831.ahmed.enther.JObjects;
 
-import android.support.annotation.NonNull;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

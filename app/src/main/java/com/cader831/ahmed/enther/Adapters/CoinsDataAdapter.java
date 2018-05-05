@@ -1,6 +1,8 @@
 package com.cader831.ahmed.enther.Adapters;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cader831.ahmed.enther.Activities.CoinSelectionActivity;
+import com.cader831.ahmed.enther.Activities.ConversionHistoryActivity;
 import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.R;
@@ -82,8 +86,7 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvSecondaryCTo = (TextView) convertView.findViewById(R.id.tvSecondaryCTo);
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
             btnShowHistory.setOnClickListener(v -> {
-                Toast.makeText(context, coinData.getPrimaryCoin().getShortName() + " " + coinData.getSecondaryCoin().getShortName() + " " + coinData.getExchange().getName(), Toast.LENGTH_SHORT).show();
-
+                StartingConversionIntent(coinData);
             });
             convertView.setTag(viewHolder);
         } else {
@@ -99,10 +102,20 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getDownloadPrice()));
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
             btnShowHistory.setOnClickListener(v -> {
-                Toast.makeText(context, coinData.getPrimaryCoin().getShortName() + " " + coinData.getSecondaryCoin().getShortName() + " " + coinData.getExchange().getName(), Toast.LENGTH_SHORT).show();
-
+                StartingConversionIntent(coinData);
             });
         }
         return convertView;
+    }
+
+    private void StartingConversionIntent(CoinData coinData) {
+        Intent showConversionHistoryActivity = new Intent(context, ConversionHistoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CoinController", coinController);
+        bundle.putSerializable("PrimaryCoinSName", coinData.getPrimaryCoin().getShortName());
+        bundle.putSerializable("SecondaryCoinSName", coinData.getSecondaryCoin().getShortName());
+        bundle.putSerializable("Exchange", coinData.getExchange());
+        showConversionHistoryActivity.putExtras(bundle);
+        context.startActivity(showConversionHistoryActivity);
     }
 }

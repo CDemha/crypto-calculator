@@ -10,30 +10,46 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.cader831.ahmed.enther.*;
+import com.cader831.ahmed.enther.APIManager;
 import com.cader831.ahmed.enther.Adapters.CoinsDataAdapter;
 import com.cader831.ahmed.enther.Adapters.ExchangeAdapter;
+import com.cader831.ahmed.enther.AsyncTaskResultEvent;
 import com.cader831.ahmed.enther.AsyncTasks.DownloadApiData;
+import com.cader831.ahmed.enther.EventBus;
 import com.cader831.ahmed.enther.JObjects.Coin;
 import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.JObjects.Exchange;
 import com.cader831.ahmed.enther.JObjects.ExchangeController;
+import com.cader831.ahmed.enther.R;
+import com.cader831.ahmed.enther.Serializer;
+import com.cader831.ahmed.enther.Utility;
 import com.squareup.otto.Subscribe;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -240,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
             exchangeController = (ExchangeController) Serializer.Deserialize(localExchangesFile);
         }
         setCoinPair("BTC", "ETH");
-        Log.i(TAG, coinController.getCoinDataMap().get("ETH-BTC-Global Average").toString());
         EventBus.getInstance().register(this);
 
         CoinsDataAdapter coinsDataAdapter = new CoinsDataAdapter(this, coinController);
