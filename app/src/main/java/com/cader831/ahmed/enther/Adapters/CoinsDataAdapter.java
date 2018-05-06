@@ -99,7 +99,7 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
             viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
-            viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getDownloadPrice()));
+            viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getCalculatedAmount()));
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
             btnShowHistory.setOnClickListener(v -> {
                 StartingConversionIntent(coinData);

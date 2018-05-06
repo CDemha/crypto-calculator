@@ -7,6 +7,7 @@ import com.cader831.ahmed.enther.Serializer;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,8 +84,8 @@ public class CoinController implements Serializable {
         return String.format("%s-%s", primaryCoin.getShortName(), secondaryCoin.getShortName());
     }
 
-    public void setCoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, CoinData coinData, File file) {
-        String coinPair = generateCoinExchangePair(primaryCoin, secondaryCoin, exchange);
+    public void addToHistory(CoinData coinData) {
+        String coinPair = generateCoinPair(coinData.getPrimaryCoin(), coinData.getSecondaryCoin());
         if (coinDataMap.containsKey(coinPair)) {
             coinDataMap.get(coinPair).add(coinData);
         } else {
@@ -92,15 +93,24 @@ public class CoinController implements Serializable {
             listOfCoinData.add(coinData);
             coinDataMap.put(coinPair, listOfCoinData);
         }
+    }
+
+    public void setCoinData(CoinData coinData, File file) {
+        addToHistory(coinData);
         Serializer.Serialize(file, this);
     }
 
-    public Map<String, ArrayList<CoinData>> getCoinDataMap() {
+    public HashMap<String, ArrayList<CoinData>> getCoinDataMap() {
         return coinDataMap;
     }
 
-    public ArrayList<CoinData> getCoinData(String coinPair) {
+    public CoinData getCoinData(String coinPair) {
+
+        if (coinDataMap.get(coinPair) == null) {
+            return null;
+        }
         Collections.sort(coinDataMap.get(coinPair));
-        return coinDataMap.get(coinPair);
+        return coinDataMap.get(coinPair).get(0);
+
     }
 }

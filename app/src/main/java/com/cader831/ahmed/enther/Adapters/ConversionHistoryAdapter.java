@@ -19,8 +19,12 @@ import java.util.Locale;
 
 public class ConversionHistoryAdapter extends BaseAdapter {
     static class ViewHolder {
+        TextView tvPrimaryCoin;
+        TextView tvSecondaryCoin;
+        TextView tvGivenUnit;
         TextView tvAmount;
         TextView tvUpdateDate;
+        TextView tvExchange;
     }
 
     private ArrayList<CoinData> coinConversionHistoryList;
@@ -67,18 +71,24 @@ public class ConversionHistoryAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.layout_conversion_history, null);
+            viewHolder.tvPrimaryCoin = (TextView) convertView.findViewById(R.id.tvPrimaryCoin);
+            viewHolder.tvSecondaryCoin = (TextView) convertView.findViewById(R.id.tvSecondaryCoin);
+            viewHolder.tvGivenUnit = (TextView) convertView.findViewById(R.id.tvGivenUnit);
             viewHolder.tvAmount = (TextView) convertView.findViewById(R.id.tvAmount);
             viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
-
-
+            viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
             convertView.setTag(viewHolder);
+
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        Log.i("MyApp", coinData.toString());
 
         if (coinData != null) {
-            viewHolder.tvAmount.setText(String.format("%.8f", coinData.getDownloadPrice()));
+            viewHolder.tvPrimaryCoin.setText(coinData.getPrimaryCoin().getShortName());
+            viewHolder.tvSecondaryCoin.setText(coinData.getSecondaryCoin().getShortName());
+            viewHolder.tvGivenUnit.setText(String.format("%.8f", coinData.getGivenUnit()));
+            viewHolder.tvAmount.setText(String.format("%.8f", coinData.getCalculatedAmount()));
+            viewHolder.tvExchange.setText(coinData.getExchange().getName());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
             viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
         }

@@ -10,10 +10,12 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -101,14 +103,12 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onAsyncTaskResult(AsyncTaskResultEvent event) {
         setCoinData(event.getResult());
-        String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
-        coinData = coinController.getCoinData(coinExchangePair).get(0);
-//        Log.i(TAG, coinController.getCoinData(coinPair)..toString());
-
-//        performCalculation(editPrimaryAmount.getText().toString());
+        coinData = coinController.getCoinData(coinPair);
+        performCalculation(editPrimaryAmount.getText().toString());
         Toast.makeText(getApplicationContext(), String.format("%s downloaded successfully.", coinPair), Toast.LENGTH_SHORT).show();
         updateConversionListview(coinController);
+
     }
 
     private void updateConversionListview(CoinController coinController) {
@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
             Double d = Double.parseDouble(coinJSONData.get(selectedSecondaryCoin.getShortName()).toString());
             BigDecimal price = new BigDecimal(d, MathContext.DECIMAL64);
             Exchange selectedExchange = (Exchange) spExchanges.getSelectedItem();
-            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, new Date());
-            coinController.setCoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, coinData, localCoinsFile);
+            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, getUserInputAmount(editPrimaryAmount.getText().toString()), new Date());
+            addToHistory(coinData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -138,10 +138,23 @@ public class MainActivity extends AppCompatActivity {
         tvConversionResult.setText(result);
     }
 
+    private BigDecimal getUserInputAmount(String amountInString) {
+        if (TextUtils.isEmpty((amountInString))) {
+            return new BigDecimal(1, MathContext.DECIMAL64);
+        } else {
+            try {
+                BigDecimal amountInBD = new BigDecimal(Double.parseDouble(amountInString.toString()));
+                return amountInBD;
+            } catch (NumberFormatException e) {
+                return new BigDecimal(1, MathContext.DECIMAL64);
+            }
+        }
+    }
+
     private void performCalculation(String amountInString) {
-        String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-        coinData = coinController.getCoinData(coinExchangePair).get(0);
-//
+        String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+        coinData = coinController.getCoinData(coinPair);
+
         if (coinData == null) {
             downloadCoinPair();
         } else {
@@ -231,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
         editPrimaryAmount = (EditText) findViewById(R.id.editPrimaryAmount);
         editPrimaryAmount.addTextChangedListener(editPrimaryAmountTextWatcher);
+        editPrimaryAmount.setOnEditorActionListener(editPrimaryAmountActionListener);
 
         spExchanges = (Spinner) findViewById(R.id.spExchanges);
 
@@ -244,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         lstvCoinData.setOnItemClickListener(lstvCoinDataHistoryClick);
-
         spExchanges.setOnItemSelectedListener(exchangeSpinnerClick);
 
         localCoinsFile = new File(getFilesDir(), Utility.FILE_COINSCONTROLLER);
@@ -262,6 +275,26 @@ public class MainActivity extends AppCompatActivity {
         lstvCoinData.setAdapter(coinsDataAdapter);
     }
 
+    private void addToHistory(CoinData coinData) {
+        coinController.setCoinData(coinData, localCoinsFile);
+        updateConversionListview(coinController);
+    }
+
+
+    private EditText.OnEditorActionListener editPrimaryAmountActionListener = new EditText.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (coinData != null) {
+                    CoinData newCoinData = new CoinData(coinData.getPrimaryCoin(), coinData.getSecondaryCoin(), coinData.getExchange(), coinData.getDownloadPrice(), getUserInputAmount(editPrimaryAmount.getText().toString()),new Date());
+                    addToHistory(newCoinData);
+                }
+                return true;
+            }
+            return false;
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -270,7 +303,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextWatcher editPrimaryAmountTextWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -278,7 +312,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable s) { }
+        public void afterTextChanged(Editable s) {
+        }
     };
 
     private AdapterView.OnItemClickListener lstvCoinDataHistoryClick = new AdapterView.OnItemClickListener() {
@@ -324,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
     };
 
-
     private View.OnLongClickListener btnCopyToClipboardHold = v -> {
         String calculatedAmount = tvConversionResult.getText().toString();
         editPrimaryAmount.setText(calculatedAmount);
@@ -335,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
         String primary = tvSecondaryCoinSelector.getText().toString();
         String secondary = tvPrimaryCoinSelector.getText().toString();
         setCoinPair(primary, secondary);
+        performCalculation(editPrimaryAmount.getText().toString());
     };
 
     private View.OnClickListener btnDownloadPairClick = (View v) -> downloadCoinPair();
@@ -367,15 +402,15 @@ public class MainActivity extends AppCompatActivity {
     private AdapterView.OnItemSelectedListener exchangeSpinnerClick = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
             selectedExchange = (Exchange) parent.getItemAtPosition(position);
-            String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-//            Log.i(TAG, coinController.getCoinData(coinExchangePair).get(0).toString());
-//            coinData = coinController.getCoinData(coinExchangePair).get(0);
-//            if (coinData == null) {
-//                downloadCoinPair();
-//            } else {
-//                performCalculation(editPrimaryAmount.getText().toString());
-//            }
+            String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+            coinData = coinController.getCoinData(coinPair);
+            if (coinData == null) {
+                downloadCoinPair();
+            } else {
+                performCalculation(editPrimaryAmount.getText().toString());
+            }
         }
 
         @Override

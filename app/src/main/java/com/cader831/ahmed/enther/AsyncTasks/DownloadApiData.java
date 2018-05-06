@@ -1,6 +1,8 @@
 package com.cader831.ahmed.enther.AsyncTasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
+
 import com.cader831.ahmed.enther.AsyncTaskResultEvent;
 import com.cader831.ahmed.enther.EventBus;
 
@@ -49,6 +51,7 @@ public class DownloadApiData extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         EventBus.getInstance().post(new AsyncTaskResultEvent(result));
+        this.cancel(true);
     }
 }
 
