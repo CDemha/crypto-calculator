@@ -19,6 +19,7 @@ import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.R;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,11 +28,12 @@ import java.util.Locale;
 
 public class CoinsDataAdapter extends BaseAdapter {
     static class ViewHolder {
-        TextView tvPrimaryC;
-        TextView tvSecondaryC;
-        TextView tvExchange;
+        TextView tvPrimaryCoin;
+        TextView tvSecondaryCoin;
+        TextView tvGivenUnit;
+        TextView tvAmount;
         TextView tvUpdateDate;
-        TextView tvSecondaryCTo;
+        TextView tvExchange;
     }
 
     private ArrayList<ArrayList<CoinData>> coinDataList;
@@ -55,6 +57,7 @@ public class CoinsDataAdapter extends BaseAdapter {
 
     public void updateListView(CoinController coinController) {
         this.coinController = coinController;
+
         for (ArrayList<CoinData> c :coinController.getCoinDataMap().values()) {
             Collections.sort(c);
         }
@@ -79,11 +82,12 @@ public class CoinsDataAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.layout_coins_data_adaptor, null);
-            viewHolder.tvPrimaryC = (TextView) convertView.findViewById(R.id.tvPrimaryC);
-            viewHolder.tvSecondaryC = (TextView) convertView.findViewById(R.id.tvSecondaryC);
-            viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
+            viewHolder.tvPrimaryCoin = (TextView) convertView.findViewById(R.id.tvPrimaryCoin);
+            viewHolder.tvSecondaryCoin = (TextView) convertView.findViewById(R.id.tvSecondaryCoin);
+            viewHolder.tvGivenUnit = (TextView) convertView.findViewById(R.id.tvGivenUnit);
+            viewHolder.tvAmount = (TextView) convertView.findViewById(R.id.tvAmount);
             viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
-            viewHolder.tvSecondaryCTo = (TextView) convertView.findViewById(R.id.tvSecondaryCTo);
+            viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
             btnShowHistory.setOnClickListener(v -> {
                 StartingConversionIntent(coinData);
@@ -94,12 +98,13 @@ public class CoinsDataAdapter extends BaseAdapter {
         }
 
         if (coinData != null) {
-            viewHolder.tvPrimaryC.setText(coinData.getPrimaryCoin().getShortName());
-            viewHolder.tvSecondaryC.setText(coinData.getSecondaryCoin().getShortName());
+            viewHolder.tvPrimaryCoin.setText(coinData.getPrimaryCoin().getShortName());
+            viewHolder.tvSecondaryCoin.setText(coinData.getSecondaryCoin().getShortName());
+            viewHolder.tvGivenUnit.setText(coinData.getGivenUnit().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
+            viewHolder.tvAmount.setText(coinData.getCalculatedAmount().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
             viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
-            viewHolder.tvSecondaryCTo.setText(String.format("%.8f", coinData.getCalculatedAmount()));
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
             btnShowHistory.setOnClickListener(v -> {
                 StartingConversionIntent(coinData);

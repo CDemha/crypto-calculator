@@ -12,6 +12,7 @@ import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.R;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,8 +87,8 @@ public class ConversionHistoryAdapter extends BaseAdapter {
         if (coinData != null) {
             viewHolder.tvPrimaryCoin.setText(coinData.getPrimaryCoin().getShortName());
             viewHolder.tvSecondaryCoin.setText(coinData.getSecondaryCoin().getShortName());
-            viewHolder.tvGivenUnit.setText(String.format("%.8f", coinData.getGivenUnit()));
-            viewHolder.tvAmount.setText(String.format("%.8f", coinData.getCalculatedAmount()));
+            viewHolder.tvGivenUnit.setText(coinData.getGivenUnit().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
+            viewHolder.tvAmount.setText(coinData.getCalculatedAmount().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
             viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));

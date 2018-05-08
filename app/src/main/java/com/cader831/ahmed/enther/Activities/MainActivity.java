@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             return new BigDecimal(1, MathContext.DECIMAL64);
         } else {
             try {
-                BigDecimal amountInBD = new BigDecimal(Double.parseDouble(amountInString.toString()));
+                BigDecimal amountInBD = new BigDecimal(Double.parseDouble(amountInString));
                 return amountInBD;
             } catch (NumberFormatException e) {
                 return new BigDecimal(1, MathContext.DECIMAL64);
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             Serializer.Serialize(localCoinsFile, coinController);
-            performCalculation(editPrimaryAmount.getText().toString());
+//            performCalculation(editPrimaryAmount.getText().toString());
         }
     }
 
