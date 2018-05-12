@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CoinData coinData;
 
+
     private void downloadCoinPair() {
 
         if (Utility.networkAvailable(this)) {
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             }
             Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
             DownloadApiData downloadApiData = new DownloadApiData();
+
             downloadApiData.execute(downloadPrice);
         } else {
             Toast.makeText(this, "A network connection is required.", Toast.LENGTH_SHORT).show();
@@ -240,7 +243,6 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnDownloadPair = (ImageButton) findViewById(R.id.btnDownloadPair);
         ImageButton btnCopyToClipboard = (ImageButton) findViewById(R.id.btnCopyToClipboard);
         ImageButton btnSwapCoins = (ImageButton) findViewById(R.id.btnSwapCoins);
-
 
         editPrimaryAmount = (EditText) findViewById(R.id.editPrimaryAmount);
         editPrimaryAmount.addTextChangedListener(editPrimaryAmountTextWatcher);
