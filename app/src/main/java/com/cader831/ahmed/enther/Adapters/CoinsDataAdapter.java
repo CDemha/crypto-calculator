@@ -121,6 +121,6 @@ public class CoinsDataAdapter extends BaseAdapter {
         bundle.putSerializable("SecondaryCoinSName", coinData.getSecondaryCoin().getShortName());
         bundle.putSerializable("Exchange", coinData.getExchange());
         showConversionHistoryActivity.putExtras(bundle);
-        context.startActivity(showConversionHistoryActivity);
+        context.startActivityForResult(showConversionHistoryActivity, 1);
     }
 }

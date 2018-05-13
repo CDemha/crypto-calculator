@@ -83,12 +83,16 @@ public class MainActivity extends AppCompatActivity {
         if (Utility.networkAvailable(this)) {
             String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
             String downloadPrice;
-            if (selectedExchange.equals(new Exchange("Global Average"))) {
+            if (selectedExchange.equals(new Exchange("Exchange Average"))) {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
             } else {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
             }
-            Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            if (selectedExchange.getName() == "Exchange Average") {
+                Toast.makeText(getApplicationContext(), String.format("Downloading %s.", coinPair), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            }
             DownloadApiData downloadApiData = new DownloadApiData();
 
             downloadApiData.execute(downloadPrice);
@@ -106,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onAsyncTaskResult(AsyncTaskResultEvent event) {
         setCoinData(event.getResult());
+//        String coinExchangePair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
         coinData = coinController.getCoinData(coinPair);
         performCalculation(editPrimaryAmount.getText().toString());
@@ -222,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (exchangeList != null) {
-            exchangeList.add(0, new Exchange("Global Average"));
+            exchangeList.add(0, new Exchange("Exchange Average"));
         }
 
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
@@ -290,8 +295,9 @@ public class MainActivity extends AppCompatActivity {
                 if (coinData != null) {
                     CoinData newCoinData = new CoinData(coinData.getPrimaryCoin(), coinData.getSecondaryCoin(), coinData.getExchange(), coinData.getDownloadPrice(), getUserInputAmount(editPrimaryAmount.getText().toString()),new Date());
                     addToHistory(newCoinData);
+                    return true;
                 }
-                return true;
+
             }
             return false;
         }
@@ -397,14 +403,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             Serializer.Serialize(localCoinsFile, coinController);
-//            performCalculation(editPrimaryAmount.getText().toString());
+        }
+        if (requestCode == Utility.RESULT_CLEAR_HISTORY) {
+            Log.i(TAG, "CLEAR");
         }
     }
 
     private AdapterView.OnItemSelectedListener exchangeSpinnerClick = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
             selectedExchange = (Exchange) parent.getItemAtPosition(position);
             String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
             coinData = coinController.getCoinData(coinPair);

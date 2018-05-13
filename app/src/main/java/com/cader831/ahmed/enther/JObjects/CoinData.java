@@ -1,5 +1,7 @@
 package com.cader831.ahmed.enther.JObjects;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -72,7 +74,7 @@ public class CoinData implements Serializable, Comparable {
     @Override
     public String toString() {
         SimpleDateFormat lastUpdateDate = new SimpleDateFormat("d/M/YY h:mm", Locale.US);
-        if (getExchange().getName().equals("Global Average")) {
+        if (getExchange().getName().equals("Exchange Average")) {
             return String.format("%s-%s: Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getDownloadPrice(), lastUpdateDate.format(lastUpdate));
         }
         return String.format("%s-%s: %s, Price: %.8f at %s", getPrimaryCoin().getShortName(), getSecondaryCoin().getShortName(), getExchange(), getDownloadPrice(), lastUpdateDate.format(lastUpdate));

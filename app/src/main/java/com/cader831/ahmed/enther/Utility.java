@@ -17,6 +17,7 @@ public class Utility {
 
     public static final int RESULT_PRIMARY_COIN_REQUEST = 1;
     public static final int RESULT_SECONDARY_COIN_REQUEST = 2;
+    public static final int RESULT_CLEAR_HISTORY = 3;
 
 
 
