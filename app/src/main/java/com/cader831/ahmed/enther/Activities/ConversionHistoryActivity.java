@@ -12,18 +12,16 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cader831.ahmed.enther.Adapters.ConversionHistoryAdapter;
+import com.cader831.ahmed.enther.Adapters.DepthConversionHistoryAdapter;
 import com.cader831.ahmed.enther.JObjects.Coin;
 import com.cader831.ahmed.enther.JObjects.CoinController;
-import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.JObjects.Exchange;
 import com.cader831.ahmed.enther.R;
 import com.cader831.ahmed.enther.Utility;
 
-import java.util.ArrayList;
-
 public class ConversionHistoryActivity extends AppCompatActivity {
 
+    private static final String TAG = "MyApp";
     CoinController coinController;
     Coin primaryCoin, secondaryCoin;
     Exchange exchange;
@@ -47,14 +45,14 @@ public class ConversionHistoryActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Conversion History");
         tvHeader.setText(String.format("%s to %s", primaryCoin.getShortName(), secondaryCoin.getShortName()));
-        ConversionHistoryAdapter conversionHistoryAdapter = new ConversionHistoryAdapter(this, coinController, coinPair);
-        lstConversionListView.setAdapter(conversionHistoryAdapter);
+        DepthConversionHistoryAdapter depthConversionHistoryAdapter = new DepthConversionHistoryAdapter(this, coinController, coinPair);
+        lstConversionListView.setAdapter(depthConversionHistoryAdapter);
     }
 
     private void showClearHistoryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Clear Conversion History ?");
-        builder.setMessage(String.format("This will clear all conversion history related to %s to %s. Do you want to continue?", primaryCoin.getShortName(), secondaryCoin.getShortName())).setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
+        builder.setTitle("Delete Conversion History?");
+        builder.setMessage(String.format("Data related to %s to %s will be deleted forever. Do you want to continue?", primaryCoin.getShortName(), secondaryCoin.getShortName())).setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
         builder.show();
     }
 
@@ -70,7 +68,12 @@ public class ConversionHistoryActivity extends AppCompatActivity {
     };
 
     private void clearConversionHistory(String coinPair) {
-        coinController.getCoinDataMap().get(coinPair).clear();
+        coinController.getCoinDataMap().remove(coinPair);
+        Intent resultIntent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CoinController", coinController);
+        resultIntent.putExtras(bundle);
+        setResult(Utility.RESULT_CLEAR_HISTORY, resultIntent);
         finish();
     }
 

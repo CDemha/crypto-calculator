@@ -27,9 +27,9 @@
         <activity
             android:name=".Activities.CoinSelectionActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".Activities.ConversionHistoryActivity" android:label="Conversion History" >
-
-        </activity>
+        <activity
+            android:name=".Activities.ConversionHistoryActivity"
+            android:label="Conversion History" />
     </application>
 
 </manifest>

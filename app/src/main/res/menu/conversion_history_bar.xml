@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/mClear"
-        android:title="Clear"
+        android:icon="@drawable/ic_action_delete"
+        android:title="Delete History"
         app:showAsAction="always" />
 </menu>

@@ -20,13 +20,12 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cader831.ahmed.enther.APIManager;
-import com.cader831.ahmed.enther.Adapters.CoinsDataAdapter;
+import com.cader831.ahmed.enther.Adapters.BriefConversionHistoryAdapter;
 import com.cader831.ahmed.enther.Adapters.ExchangeAdapter;
 import com.cader831.ahmed.enther.AsyncTaskResultEvent;
 import com.cader831.ahmed.enther.AsyncTasks.DownloadApiData;
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateConversionListview(CoinController coinController) {
-        ((CoinsDataAdapter) lstvCoinData.getAdapter()).updateListView(coinController);
+        ((BriefConversionHistoryAdapter) lstvCoinData.getAdapter()).updateListView(coinController);
     }
 
     private void setCoinData(String downloadedData) {
@@ -278,8 +277,9 @@ public class MainActivity extends AppCompatActivity {
         setCoinPair("BTC", "ETH");
         EventBus.getInstance().register(this);
 
-        CoinsDataAdapter coinsDataAdapter = new CoinsDataAdapter(this, coinController);
-        lstvCoinData.setAdapter(coinsDataAdapter);
+        BriefConversionHistoryAdapter briefConversionHistoryAdapter = new BriefConversionHistoryAdapter(this, coinController);
+        lstvCoinData.setAdapter(briefConversionHistoryAdapter);
+        lstvCoinData.setEmptyView(findViewById(R.id.emptyElement));
     }
 
     private void addToHistory(CoinData coinData) {
@@ -405,7 +405,9 @@ public class MainActivity extends AppCompatActivity {
             Serializer.Serialize(localCoinsFile, coinController);
         }
         if (requestCode == Utility.RESULT_CLEAR_HISTORY) {
-            Log.i(TAG, "CLEAR");
+            if (data != null) {
+                coinController = (CoinController) data.getExtras().getSerializable("CoinController");
+            }
         }
     }
 
