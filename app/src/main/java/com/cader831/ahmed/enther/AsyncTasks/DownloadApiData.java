@@ -1,6 +1,10 @@
 package com.cader831.ahmed.enther.AsyncTasks;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
+import android.util.Log;
+import android.widget.ProgressBar;
+
 import com.cader831.ahmed.enther.AsyncTaskResultEvent;
 import com.cader831.ahmed.enther.EventBus;
 
@@ -10,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DownloadApiData extends AsyncTask<String, Void, String> {
-
 
     protected void onPreExecute() {
 
@@ -49,6 +52,7 @@ public class DownloadApiData extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         EventBus.getInstance().post(new AsyncTaskResultEvent(result));
+        this.cancel(true);
     }
 }
 

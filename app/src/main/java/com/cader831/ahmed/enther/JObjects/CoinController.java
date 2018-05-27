@@ -1,13 +1,12 @@
 package com.cader831.ahmed.enther.JObjects;
 
-import android.util.Log;
-
 import com.cader831.ahmed.enther.Serializer;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class CoinController implements Serializable {
 
     private Map<String, Coin> mapOfCoins = new HashMap<>();
     private Map<String, String> coinNames = new HashMap<>();
-    private HashMap<String, CoinData> coinDataMap = new HashMap<>();
+    private HashMap<String, ArrayList<CoinData>> coinDataMap = new HashMap<>();
 
     public CoinController() {
 
@@ -82,17 +81,49 @@ public class CoinController implements Serializable {
         return String.format("%s-%s", primaryCoin.getShortName(), secondaryCoin.getShortName());
     }
 
-    public void setCoinData(Coin primaryCoin, Coin secondaryCoin, Exchange exchange, CoinData coinData, File file) {
-        String coinPair = generateCoinExchangePair(primaryCoin, secondaryCoin, exchange);
-        coinDataMap.put(coinPair, coinData);
+    public void addToHistory(CoinData coinData) {
+        String coinPair = generateCoinPair(coinData.getPrimaryCoin(), coinData.getSecondaryCoin());
+        if (coinDataMap.containsKey(coinPair)) {
+            if (!coinDataExist(coinData, coinPair)) {
+                coinDataMap.get(coinPair).add(coinData);
+            }
+
+        } else {
+            ArrayList<CoinData> listOfCoinData = new ArrayList();
+            listOfCoinData.add(coinData);
+            coinDataMap.put(coinPair, listOfCoinData);
+        }
+    }
+
+    private boolean coinDataExist(CoinData coinData, String coinPair) {
+        SimpleDateFormat compareFormat = new SimpleDateFormat("d/M/YY h:mm");
+
+        String newCoinDataDate = compareFormat.format(coinData.getLastUpdate());
+        for (CoinData c : coinDataMap.get(coinPair)) {
+            String existingCoinDate = compareFormat.format(c.getLastUpdate());
+            if (newCoinDataDate.equals(existingCoinDate) & coinData.getCalculatedAmount().equals(c.getCalculatedAmount()) & coinData.getExchange().equals(c.getExchange()) & coinData.getGivenUnit().equals(c.getGivenUnit())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setCoinData(CoinData coinData, File file) {
+        addToHistory(coinData);
         Serializer.Serialize(file, this);
     }
 
-    public Map<String, CoinData> getCoinDataMap() {
+    public HashMap<String, ArrayList<CoinData>> getCoinDataMap() {
         return coinDataMap;
     }
 
     public CoinData getCoinData(String coinPair) {
-        return coinDataMap.get(coinPair);
+
+        if (coinDataMap.get(coinPair) == null) {
+            return null;
+        }
+        Collections.sort(coinDataMap.get(coinPair));
+        return coinDataMap.get(coinPair).get(0);
+
     }
 }

@@ -4,29 +4,26 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.cader831.ahmed.enther.Activities.CoinSelectionActivity;
 import com.cader831.ahmed.enther.Activities.ConversionHistoryActivity;
 import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.R;
+import com.cader831.ahmed.enther.Utility;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
-public class CoinsDataAdapter extends BaseAdapter {
+public class BriefConversionHistoryAdapter extends BaseAdapter {
     static class ViewHolder {
         TextView tvPrimaryCoin;
         TextView tvSecondaryCoin;
@@ -40,7 +37,7 @@ public class CoinsDataAdapter extends BaseAdapter {
     private Activity context;
     private CoinController coinController;
 
-    public CoinsDataAdapter(Activity context, CoinController coinController) {
+    public BriefConversionHistoryAdapter(Activity context, CoinController coinController) {
         this.context = context;
         updateListView(coinController);
     }
@@ -63,7 +60,7 @@ public class CoinsDataAdapter extends BaseAdapter {
         }
         coinDataList = new ArrayList<>(coinController.getCoinDataMap().values());
         Collections.sort(coinDataList, (o2, o1) -> o1.get(0).getLastUpdate().compareTo(o2.get(0).getLastUpdate()));
-        CoinsDataAdapter.this.notifyDataSetChanged();
+        BriefConversionHistoryAdapter.this.notifyDataSetChanged();
     }
 
     @Override
@@ -103,12 +100,11 @@ public class CoinsDataAdapter extends BaseAdapter {
             viewHolder.tvGivenUnit.setText(coinData.getGivenUnit().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
             viewHolder.tvAmount.setText(coinData.getCalculatedAmount().setScale(8, BigDecimal.ROUND_HALF_UP).stripTrailingZeros().toPlainString());
             viewHolder.tvExchange.setText(coinData.getExchange().getName());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a", Locale.US);
-            viewHolder.tvUpdateDate.setText(simpleDateFormat.format(coinData.getLastUpdate()));
+
+            CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(coinData.getLastUpdate().getTime(), System.currentTimeMillis(), 0L, DateUtils.FORMAT_ABBREV_ALL);
+            viewHolder.tvUpdateDate.setText(relativeTimeSpanString);
             ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
-            btnShowHistory.setOnClickListener(v -> {
-                StartingConversionIntent(coinData);
-            });
+            btnShowHistory.setOnClickListener(v -> StartingConversionIntent(coinData));
         }
         return convertView;
     }
@@ -121,6 +117,6 @@ public class CoinsDataAdapter extends BaseAdapter {
         bundle.putSerializable("SecondaryCoinSName", coinData.getSecondaryCoin().getShortName());
         bundle.putSerializable("Exchange", coinData.getExchange());
         showConversionHistoryActivity.putExtras(bundle);
-        context.startActivityForResult(showConversionHistoryActivity, 1);
+        context.startActivityForResult(showConversionHistoryActivity, Utility.RESULT_CLEAR_HISTORY);
     }
 }

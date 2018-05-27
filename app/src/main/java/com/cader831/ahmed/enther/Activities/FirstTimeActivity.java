@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cader831.ahmed.enther.AsyncTasks.DownloadCoins;
@@ -19,6 +20,7 @@ public class FirstTimeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         boolean coinFileCreated = preferences.getBoolean(Utility.PREFS_COINS_FILE_CREATED, false);
         boolean exchangeFileCreated = preferences.getBoolean(Utility.PREFS_EXCHANGES_FILE_CREATED, false);

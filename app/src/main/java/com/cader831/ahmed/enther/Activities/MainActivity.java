@@ -10,18 +10,34 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.cader831.ahmed.enther.*;
-import com.cader831.ahmed.enther.Adapters.CoinsDataAdapter;
+import com.cader831.ahmed.enther.APIManager;
+import com.cader831.ahmed.enther.Adapters.BriefConversionHistoryAdapter;
 import com.cader831.ahmed.enther.Adapters.ExchangeAdapter;
+import com.cader831.ahmed.enther.AsyncTaskResultEvent;
 import com.cader831.ahmed.enther.AsyncTasks.DownloadApiData;
+import com.cader831.ahmed.enther.EventBus;
 import com.cader831.ahmed.enther.JObjects.Coin;
 import com.cader831.ahmed.enther.JObjects.CoinController;
 import com.cader831.ahmed.enther.JObjects.CoinData;
 import com.cader831.ahmed.enther.JObjects.Exchange;
 import com.cader831.ahmed.enther.JObjects.ExchangeController;
+import com.cader831.ahmed.enther.R;
+import com.cader831.ahmed.enther.Serializer;
+import com.cader831.ahmed.enther.Utility;
 import com.squareup.otto.Subscribe;
 
 import org.json.JSONException;
@@ -32,7 +48,10 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,18 +76,24 @@ public class MainActivity extends AppCompatActivity {
 
     private CoinData coinData;
 
+
     private void downloadCoinPair() {
 
         if (Utility.networkAvailable(this)) {
             String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
             String downloadPrice;
-            if (selectedExchange.equals(new Exchange("Global Average"))) {
+            if (selectedExchange.equals(new Exchange("Exchange Average"))) {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin);
             } else {
                 downloadPrice = apiManager.generatePriceLink(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
             }
-            Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            if (selectedExchange.getName() == "Exchange Average") {
+                Toast.makeText(getApplicationContext(), String.format("Downloading %s.", coinPair), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), String.format("Downloading %s from %s.", coinPair, selectedExchange), Toast.LENGTH_SHORT).show();
+            }
             DownloadApiData downloadApiData = new DownloadApiData();
+
             downloadApiData.execute(downloadPrice);
         } else {
             Toast.makeText(this, "A network connection is required.", Toast.LENGTH_SHORT).show();
@@ -84,16 +109,17 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onAsyncTaskResult(AsyncTaskResultEvent event) {
         setCoinData(event.getResult());
-        String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
+//        String coinExchangePair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
         String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
-        coinData = coinController.getCoinData(coinExchangePair);
+        coinData = coinController.getCoinData(coinPair);
         performCalculation(editPrimaryAmount.getText().toString());
         Toast.makeText(getApplicationContext(), String.format("%s downloaded successfully.", coinPair), Toast.LENGTH_SHORT).show();
         updateConversionListview(coinController);
+
     }
 
     private void updateConversionListview(CoinController coinController) {
-        ((CoinsDataAdapter) lstvCoinData.getAdapter()).updateListView(coinController);
+        ((BriefConversionHistoryAdapter) lstvCoinData.getAdapter()).updateListView(coinController);
     }
 
     private void setCoinData(String downloadedData) {
@@ -102,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
             Double d = Double.parseDouble(coinJSONData.get(selectedSecondaryCoin.getShortName()).toString());
             BigDecimal price = new BigDecimal(d, MathContext.DECIMAL64);
             Exchange selectedExchange = (Exchange) spExchanges.getSelectedItem();
-            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, new Date());
-            coinController.setCoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, coinData, localCoinsFile);
+            CoinData coinData = new CoinData(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange, price, getUserInputAmount(editPrimaryAmount.getText().toString()), new Date());
+            addToHistory(coinData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -119,9 +145,22 @@ public class MainActivity extends AppCompatActivity {
         tvConversionResult.setText(result);
     }
 
+    private BigDecimal getUserInputAmount(String amountInString) {
+        if (TextUtils.isEmpty((amountInString))) {
+            return new BigDecimal(1, MathContext.DECIMAL64);
+        } else {
+            try {
+                BigDecimal amountInBD = new BigDecimal(Double.parseDouble(amountInString));
+                return amountInBD;
+            } catch (NumberFormatException e) {
+                return new BigDecimal(1, MathContext.DECIMAL64);
+            }
+        }
+    }
+
     private void performCalculation(String amountInString) {
-        String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-        coinData = coinController.getCoinData(coinExchangePair);
+        String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+        coinData = coinController.getCoinData(coinPair);
 
         if (coinData == null) {
             downloadCoinPair();
@@ -187,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (exchangeList != null) {
-            exchangeList.add(0, new Exchange("Global Average"));
+            exchangeList.add(0, new Exchange("Exchange Average"));
         }
 
         ExchangeAdapter spExchangeAdapter = new ExchangeAdapter(this, android.R.layout.simple_spinner_dropdown_item, exchangeList);
@@ -211,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
         editPrimaryAmount = (EditText) findViewById(R.id.editPrimaryAmount);
         editPrimaryAmount.addTextChangedListener(editPrimaryAmountTextWatcher);
+        editPrimaryAmount.setOnEditorActionListener(editPrimaryAmountActionListener);
 
         spExchanges = (Spinner) findViewById(R.id.spExchanges);
 
@@ -222,8 +262,8 @@ public class MainActivity extends AppCompatActivity {
         tvSecondaryCoinSelector.setOnClickListener(tvSecondaryCoinSelectorClick);
         btnSwapCoins.setOnClickListener(btnSwapCoinsClick);
 
-        lstvCoinData.setOnItemClickListener(lstvCoinDataHistoryClick);
 
+        lstvCoinData.setOnItemClickListener(lstvCoinDataHistoryClick);
         spExchanges.setOnItemSelectedListener(exchangeSpinnerClick);
 
         localCoinsFile = new File(getFilesDir(), Utility.FILE_COINSCONTROLLER);
@@ -237,9 +277,31 @@ public class MainActivity extends AppCompatActivity {
         setCoinPair("BTC", "ETH");
         EventBus.getInstance().register(this);
 
-        CoinsDataAdapter coinsDataAdapter = new CoinsDataAdapter(this, coinController);
-        lstvCoinData.setAdapter(coinsDataAdapter);
+        BriefConversionHistoryAdapter briefConversionHistoryAdapter = new BriefConversionHistoryAdapter(this, coinController);
+        lstvCoinData.setAdapter(briefConversionHistoryAdapter);
+        lstvCoinData.setEmptyView(findViewById(R.id.emptyElement));
     }
+
+    private void addToHistory(CoinData coinData) {
+        coinController.setCoinData(coinData, localCoinsFile);
+        updateConversionListview(coinController);
+    }
+
+
+    private EditText.OnEditorActionListener editPrimaryAmountActionListener = new EditText.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (coinData != null) {
+                    CoinData newCoinData = new CoinData(coinData.getPrimaryCoin(), coinData.getSecondaryCoin(), coinData.getExchange(), coinData.getDownloadPrice(), getUserInputAmount(editPrimaryAmount.getText().toString()),new Date());
+                    addToHistory(newCoinData);
+                    return true;
+                }
+
+            }
+            return false;
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -249,7 +311,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextWatcher editPrimaryAmountTextWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -257,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable s) { }
+        public void afterTextChanged(Editable s) {
+        }
     };
 
     private AdapterView.OnItemClickListener lstvCoinDataHistoryClick = new AdapterView.OnItemClickListener() {
@@ -280,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable("CoinController", coinController);
         selectCoinsActivity.putExtras(bundle);
-        startActivityForResult(selectCoinsActivity, Utility.ACTIVITYRESULT_PRIMARY_COIN_REQUEST);
+        startActivityForResult(selectCoinsActivity, Utility.RESULT_PRIMARY_COIN_REQUEST);
     };
 
     private View.OnLongClickListener tvPrimaryCoinSelectorLongClick = v -> {
@@ -293,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable("CoinController", coinController);
         selectCoinsActivity.putExtras(bundle);
-        startActivityForResult(selectCoinsActivity, Utility.ACTIVITYRESULT_SECONDARY_COIN_REQUEST);
+        startActivityForResult(selectCoinsActivity, Utility.RESULT_SECONDARY_COIN_REQUEST);
     };
 
     private View.OnClickListener btnCopyToClipboardClick = v -> {
@@ -313,6 +377,7 @@ public class MainActivity extends AppCompatActivity {
         String primary = tvSecondaryCoinSelector.getText().toString();
         String secondary = tvPrimaryCoinSelector.getText().toString();
         setCoinPair(primary, secondary);
+        performCalculation(editPrimaryAmount.getText().toString());
     };
 
     private View.OnClickListener btnDownloadPairClick = (View v) -> downloadCoinPair();
@@ -326,19 +391,23 @@ public class MainActivity extends AppCompatActivity {
             Coin selectedCoin = (Coin) data.getSerializableExtra("SelectedCoin");
 
             if (resultCode == RESULT_OK) {
-                if (requestCode == Utility.ACTIVITYRESULT_PRIMARY_COIN_REQUEST) {
+                if (requestCode == Utility.RESULT_PRIMARY_COIN_REQUEST) {
                     if (selectedCoin != null) {
                         setPrimaryCoin(coinController.getCoin(selectedCoin.getLongName()).getShortName());
                     }
                 }
-                if (requestCode == Utility.ACTIVITYRESULT_SECONDARY_COIN_REQUEST) {
+                if (requestCode == Utility.RESULT_SECONDARY_COIN_REQUEST) {
                     if (selectedCoin != null) {
                         setSecondaryCoin(coinController.getCoin(selectedCoin.getLongName()).getShortName());
                     }
                 }
             }
             Serializer.Serialize(localCoinsFile, coinController);
-            performCalculation(editPrimaryAmount.getText().toString());
+        }
+        if (requestCode == Utility.RESULT_CLEAR_HISTORY) {
+            if (data != null) {
+                coinController = (CoinController) data.getExtras().getSerializable("CoinController");
+            }
         }
     }
 
@@ -346,8 +415,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedExchange = (Exchange) parent.getItemAtPosition(position);
-            String coinExchangePair = coinController.generateCoinExchangePair(selectedPrimaryCoin, selectedSecondaryCoin, selectedExchange);
-            coinData = coinController.getCoinData(coinExchangePair);
+            String coinPair = coinController.generateCoinPair(selectedPrimaryCoin, selectedSecondaryCoin);
+            coinData = coinController.getCoinData(coinPair);
             if (coinData == null) {
                 downloadCoinPair();
             } else {
