@@ -30,6 +30,9 @@
         <activity
             android:name=".Activities.ConversionHistoryActivity"
             android:label="Conversion History" />
+        <activity android:name=".Activities.SettingsActivity">
+            android:label="Settings"
+        </activity>
     </application>
 
 </manifest>

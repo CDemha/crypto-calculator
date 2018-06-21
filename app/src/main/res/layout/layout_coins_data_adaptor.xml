@@ -146,6 +146,7 @@
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
         android:cropToPadding="true"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_conversion_history" />
 
 </LinearLayout>

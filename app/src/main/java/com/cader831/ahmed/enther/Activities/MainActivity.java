@@ -262,8 +262,9 @@ public class MainActivity extends AppCompatActivity {
         tvSecondaryCoinSelector.setOnClickListener(tvSecondaryCoinSelectorClick);
         btnSwapCoins.setOnClickListener(btnSwapCoinsClick);
 
-
+        lstvCoinData.setLongClickable(true);
         lstvCoinData.setOnItemClickListener(lstvCoinDataHistoryClick);
+        lstvCoinData.setOnItemLongClickListener(lstvLongClick);
         spExchanges.setOnItemSelectedListener(exchangeSpinnerClick);
 
         localCoinsFile = new File(getFilesDir(), Utility.FILE_COINSCONTROLLER);
@@ -324,6 +325,26 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private void StartingConversionIntent(CoinData coinData) {
+        Intent showConversionHistoryActivity = new Intent(this, ConversionHistoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CoinController", coinController);
+        bundle.putSerializable("PrimaryCoinSName", coinData.getPrimaryCoin().getShortName());
+        bundle.putSerializable("SecondaryCoinSName", coinData.getSecondaryCoin().getShortName());
+        bundle.putSerializable("Exchange", coinData.getExchange());
+        showConversionHistoryActivity.putExtras(bundle);
+        this.startActivityForResult(showConversionHistoryActivity, Utility.RESULT_CLEAR_HISTORY);
+    }
+
+    private AdapterView.OnItemLongClickListener lstvLongClick = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            CoinData coinData = (CoinData)lstvCoinData.getAdapter().getItem(position);
+            StartingConversionIntent(coinData);
+            return false;
+        }
+    };
+
     private AdapterView.OnItemClickListener lstvCoinDataHistoryClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -348,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private View.OnLongClickListener tvPrimaryCoinSelectorLongClick = v -> {
-        Toast.makeText(getApplicationContext(), "LONG", Toast.LENGTH_SHORT);
+
         return true;
     };
 
@@ -442,7 +463,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mSettings:
-
+                Intent settingsAcitivty = new Intent(this, SettingsActivity.class);
+                startActivity(settingsAcitivty);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

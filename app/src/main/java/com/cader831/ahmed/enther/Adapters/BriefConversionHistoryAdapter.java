@@ -85,10 +85,10 @@ public class BriefConversionHistoryAdapter extends BaseAdapter {
             viewHolder.tvAmount = (TextView) convertView.findViewById(R.id.tvAmount);
             viewHolder.tvUpdateDate = (TextView) convertView.findViewById(R.id.tvUpdateDate);
             viewHolder.tvExchange = (TextView) convertView.findViewById(R.id.tvExchange);
-            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
-            btnShowHistory.setOnClickListener(v -> {
-                StartingConversionIntent(coinData);
-            });
+//            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
+//            btnShowHistory.setOnClickListener(v -> {
+//                StartingConversionIntent(coinData);
+//            });
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -103,8 +103,8 @@ public class BriefConversionHistoryAdapter extends BaseAdapter {
 
             CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(coinData.getLastUpdate().getTime(), System.currentTimeMillis(), 0L, DateUtils.FORMAT_ABBREV_ALL);
             viewHolder.tvUpdateDate.setText(relativeTimeSpanString);
-            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
-            btnShowHistory.setOnClickListener(v -> StartingConversionIntent(coinData));
+//            ImageButton btnShowHistory = (ImageButton) convertView.findViewById(R.id.btnShowHistory);
+//            btnShowHistory.setOnClickListener(v -> StartingConversionIntent(coinData));
         }
         return convertView;
     }
